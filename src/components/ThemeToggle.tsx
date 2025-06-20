@@ -16,6 +16,7 @@ export function ThemeToggle() {
   const [effectiveTheme, setEffectiveTheme] = useState('light');
   
   useEffect(() => {
+    if (typeof window === 'undefined') return;
     if (theme === 'system') {
       setEffectiveTheme(window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
     } else {
