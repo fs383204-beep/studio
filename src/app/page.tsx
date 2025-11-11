@@ -37,7 +37,7 @@ export default function HomePage() {
       <header className="sticky top-0 z-10 w-full bg-background/80 backdrop-blur-sm shadow-sm">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between h-16">
-            <h1 className="text-2xl font-bold font-headline tracking-tight">TitleNote</h1>
+            <h1 className="text-2xl font-bold font-headline tracking-tight">SmartNote Titles</h1>
             <ThemeToggle />
           </div>
         </div>
