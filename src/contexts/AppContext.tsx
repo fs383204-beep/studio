@@ -5,15 +5,6 @@ import { useLocalStorage } from '@/hooks/use-local-storage';
 import { Title, Note } from '@/lib/types';
 import { v4 as uuidv4 } from 'uuid';
 
-// Due to using local storage which is client side, we cannot import uuid directly in a server component context. A workaround is to require it on demand.
-let v4: () => string;
-try {
-  v4 = require('uuid').v4;
-} catch (e) {
-  v4 = () => `mock-id-${Math.random()}`;
-}
-
-
 interface AppContextType {
   titles: Title[];
   addTitle: (name: string) => void;
@@ -39,7 +30,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
 
   const addTitle = useCallback((name: string) => {
     const newTitle: Title = {
-      id: v4(),
+      id: uuidv4(),
       name,
       notes: [],
       createdAt: Date.now(),
@@ -62,7 +53,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
 
   const addNote = useCallback((titleId: string, content: string) => {
     const newNote: Note = {
-      id: v4(),
+      id: uuidv4(),
       content,
       createdAt: Date.now(),
     };
