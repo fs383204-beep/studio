@@ -1,0 +1,147 @@
++ set -euo pipefail
++ PROJECT_ID=titlenote
+++ pwd
++ OUTDIR=/home/user/studio/project-export
++ GCS_BUCKET=titlenote-backup
+++ date +%Y%m%d_%H%M%S
++ TIMESTAMP=20251112_032227
++ FS_EXPORT_DIR=firestore-export-20251112_032227
++ echo 'Output directory: /home/user/studio/project-export'
+Output directory: /home/user/studio/project-export
++ mkdir -p /home/user/studio/project-export/firebase-exports /home/user/studio/project-export/metadata /home/user/studio/project-export/functions
++ echo 'Checking firebase & gcloud auth...'
+Checking firebase & gcloud auth...
++ firebase projects:list
++ grep -q titlenote
+- Preparing the list of your Firebase projects
+✔ Preparing the list of your Firebase projects
++ echo 'Setting gcloud project to titlenote'
+Setting gcloud project to titlenote
++ gcloud config set project titlenote
+Updated property [core/project].
++ gsutil ls -b gs://titlenote-backup
++ echo 'Creating GCS bucket gs://titlenote-backup'
+Creating GCS bucket gs://titlenote-backup
++ gsutil mb -p titlenote gs://titlenote-backup
+Creating gs://titlenote-backup/...
+You are attempting to access protected data with no configured
+credentials. Please visit https://cloud.google.com/console#/project
+and sign up for an account, and then run the "gcloud auth login"
+command to configure gsutil to use these credentials.
++ echo 'Bucket creation failed (may exist or no permission)'
+Bucket creation failed (may exist or no permission)
++ echo 'Starting Firestore export...'
+Starting Firestore export...
++ gcloud firestore export gs://titlenote-backup/firestore-export-20251112_032227 --project titlenote
+API [firestore.googleapis.com] not enabled on project [titlenote]. Would you like to enable and 
+retry (this will take a few minutes)? (y/N)?  Please enter 'y' or 'n':  Please enter 'y' or 'n':  
+ERROR: (gcloud.firestore.export) PERMISSION_DENIED: Cloud Firestore API has not been used in project titlenote before or it is disabled. Enable it by visiting https://console.developers.google.com/apis/api/firestore.googleapis.com/overview?project=titlenote then retry. If you enabled this API recently, wait a few minutes for the action to propagate to our systems and retry. This command is authenticated as fs383204@gmail.com which is the active account specified by the [core/account] property.
+- '@type': type.googleapis.com/google.rpc.ErrorInfo
+  domain: googleapis.com
+  metadata:
+    activationUrl: https://console.developers.google.com/apis/api/firestore.googleapis.com/overview?project=titlenote
+    consumer: projects/titlenote
+    containerInfo: titlenote
+    service: firestore.googleapis.com
+    serviceTitle: Cloud Firestore API
+  reason: SERVICE_DISABLED
+- '@type': type.googleapis.com/google.rpc.LocalizedMessage
+  locale: en-US
+  message: Cloud Firestore API has not been used in project titlenote before or it
+    is disabled. Enable it by visiting https://console.developers.google.com/apis/api/firestore.googleapis.com/overview?project=titlenote
+    then retry. If you enabled this API recently, wait a few minutes for the action
+    to propagate to our systems and retry.
+- '@type': type.googleapis.com/google.rpc.Help
+  links:
+  - description: Google developers console API activation
+    url: https://console.developers.google.com/apis/api/firestore.googleapis.com/overview?project=titlenote
++ echo 'Firestore export failed (billing/permission?)'
+Firestore export failed (billing/permission?)
++ echo 'Downloading Firestore export...'
+Downloading Firestore export...
++ mkdir -p /home/user/studio/project-export/firebase-exports/firestore
++ gsutil -m cp -r gs://titlenote-backup/firestore-export-20251112_032227 /home/user/studio/project-export/firebase-exports/firestore/
+BucketNotFoundException: 404 gs://titlenote-backup bucket does not exist.
+CommandException: 1 file/object could not be transferred.
++ echo 'Firestore download failed or not present'
+Firestore download failed or not present
++ RTDB_INSTANCE=
++ command -v firebase
++ echo 'Attempting Realtime Database export...'
+Attempting Realtime Database export...
++ '[' -z '' ']'
++ set +e
++ firebase database:get / --project titlenote
++ '[' 0 -ne 0 ']'
++ echo 'Saved Realtime DB to /home/user/studio/project-export/firebase-exports/rtdb.json'
+Saved Realtime DB to /home/user/studio/project-export/firebase-exports/rtdb.json
++ set -e
++ STORAGE_BUCKET=titlenote.appspot.com
++ echo 'Syncing storage bucket gs://titlenote.appspot.com to local folder...'
+Syncing storage bucket gs://titlenote.appspot.com to local folder...
++ mkdir -p /home/user/studio/project-export/firebase-exports/storage
++ gsutil -m rsync -r gs://titlenote.appspot.com /home/user/studio/project-export/firebase-exports/storage
+Building synchronization state...
+Caught non-retryable exception while listing gs://titlenote.appspot.com/: BucketNotFoundException: 404 gs://titlenote.appspot.com bucket does not exist.
+CommandException: Caught non-retryable exception - aborting rsync
++ echo 'Storage sync may have failed (check bucket name/permissions).'
+Storage sync may have failed (check bucket name/permissions).
++ echo 'Exporting Auth users...'
+Exporting Auth users...
++ firebase auth:export /home/user/studio/project-export/firebase-exports/users.json --project titlenote --format=json
+Exporting accounts to /home/user/studio/project-export/firebase-exports/users.json
+
+Error: Request to https://www.googleapis.com/identitytoolkit/v3/relyingparty/downloadAccount had HTTP Error: 400, CONFIGURATION_NOT_FOUND
++ echo 'Auth export failed or no users.'
+Auth export failed or no users.
++ echo 'Exporting rules & indexes...'
+Exporting rules & indexes...
++ firebase firestore:rules:get --project titlenote
++ echo 'No firestore rules fetched.'
+No firestore rules fetched.
++ firebase database:rules:get --project titlenote
++ echo 'No realtime DB rules fetched or not used.'
+No realtime DB rules fetched or not used.
++ firebase storage:rules:get --project titlenote
++ echo 'No storage rules fetched.'
+No storage rules fetched.
++ firebase firestore:indexes
++ echo 'No indexes exported or CLI not available.'
+No indexes exported or CLI not available.
++ for hb in "${PROJECT_ID}.web.app" "${PROJECT_ID}.appspot.com"
++ gsutil ls -b gs://titlenote.web.app
++ for hb in "${PROJECT_ID}.web.app" "${PROJECT_ID}.appspot.com"
++ gsutil ls -b gs://titlenote.appspot.com
++ gcloud functions list --project titlenote
+API [cloudfunctions.googleapis.com] not enabled on project [titlenote]. Would you like to enable 
+and retry (this will take a few minutes)? (y/N)?  Please enter 'y' or 'n':  Please enter 'y' or 'n':  
+ERROR: (gcloud.functions.list) [fs383204@gmail.com] does not have permission to access projects instance [titlenote] (or it may not exist): Cloud Functions API has not been used in project titlenote before or it is disabled. Enable it by visiting https://console.developers.google.com/apis/api/cloudfunctions.googleapis.com/overview?project=titlenote then retry. If you enabled this API recently, wait a few minutes for the action to propagate to our systems and retry. This command is authenticated as fs383204@gmail.com which is the active account specified by the [core/account] property.
+- '@type': type.googleapis.com/google.rpc.ErrorInfo
+  domain: googleapis.com
+  metadata:
+    activationUrl: https://console.developers.google.com/apis/api/cloudfunctions.googleapis.com/overview?project=titlenote
+    consumer: projects/titlenote
+    containerInfo: titlenote
+    service: cloudfunctions.googleapis.com
+    serviceTitle: Cloud Functions API
+  reason: SERVICE_DISABLED
+- '@type': type.googleapis.com/google.rpc.LocalizedMessage
+  locale: en-US
+  message: Cloud Functions API has not been used in project titlenote before or it
+    is disabled. Enable it by visiting https://console.developers.google.com/apis/api/cloudfunctions.googleapis.com/overview?project=titlenote
+    then retry. If you enabled this API recently, wait a few minutes for the action
+    to propagate to our systems and retry.
+- '@type': type.googleapis.com/google.rpc.Help
+  links:
+  - description: Google developers console API activation
+    url: https://console.developers.google.com/apis/api/cloudfunctions.googleapis.com/overview?project=titlenote
++ echo 'gcloud functions list failed.'
+gcloud functions list failed.
++ cd /home/user/studio/project-export
++ zip -r ../titlenote_export_20251112_032227.zip .
+./export_all_titlenote.sh: line 88: zip: command not found
++ echo 'zip failed'
+zip failed
++ cd -
++ echo 'All done. Export ZIP: /home/user/studio/project-export/../titlenote_export_20251112_032227.zip'
+All done. Export ZIP: /home/user/studio/project-export/../titlenote_export_20251112_032227.zip

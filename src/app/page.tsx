@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useContext, useMemo } from 'react';
+import { useState, useContext, useMemo, useEffect } from 'react';
 import Link from 'next/link';
 import { AppContext } from '@/contexts/AppContext';
 import { Button } from '@/components/ui/button';
@@ -23,6 +23,13 @@ export default function HomePage() {
       setIsAddDialogOpen(false);
     }
   };
+  
+  // Reset newTitle when dialog closes
+  useEffect(() => {
+    if (!isAddDialogOpen) {
+      setNewTitle('');
+    }
+  }, [isAddDialogOpen]);
 
   const filteredTitles = useMemo(() => {
     return titles
@@ -68,7 +75,7 @@ export default function HomePage() {
                 <Card className="h-full hover:shadow-md transition-shadow duration-300 hover:border-primary cursor-pointer flex flex-col">
                   <CardHeader>
                     <CardTitle className="font-headline truncate">{title.name}</CardTitle>
-                    <CardDescription>{title.notes.length} {title.notes.length === 1 ? 'note' : 'notes'}</CardDescription>
+                    <CardDescription className="text-xs">{title.notes.length} {title.notes.length === 1 ? 'note' : 'notes'}</CardDescription>
                   </CardHeader>
                 </Card>
               </Link>

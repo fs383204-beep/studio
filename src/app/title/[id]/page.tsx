@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useContext, useMemo, useEffect } from 'react';
+import { useState, useContext, useMemo, useEffect, useRef } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { AppContext } from '@/contexts/AppContext';
@@ -37,11 +37,11 @@ export default function TitleDetailPage() {
   const [newNoteContent, setNewNoteContent] = useState('');
   const [noteToDelete, setNoteToDelete] = useState<Note | null>(null);
   const [isTitleDeleteAlertOpen, setIsTitleDeleteAlertOpen] = useState(false);
+  const notesEndRef = useRef<HTMLDivElement>(null);
   
   // Effect to redirect if title not found
   useEffect(() => {
     if (!title) {
-        // give a moment for context to load from localstorage
         const timeout = setTimeout(() => {
             if(!findTitleById(titleId)) {
                 router.push('/');
@@ -50,11 +50,16 @@ export default function TitleDetailPage() {
         return () => clearTimeout(timeout);
     }
   }, [title, titleId, router, findTitleById]);
+  
+  const scrollToBottom = () => {
+    notesEndRef.current?.scrollIntoView({ behavior: "smooth", block: 'start' });
+  };
 
   const handleAddNote = () => {
     if (newNoteContent.trim() && title) {
       addNote(title.id, newNoteContent.trim());
       setNewNoteContent('');
+      setTimeout(() => scrollToBottom(), 100);
     }
   };
 
@@ -77,7 +82,7 @@ export default function TitleDetailPage() {
       });
     }
   };
-  
+
   const performNoteDeletion = () => {
     if(noteToDelete && title) {
         deleteNote(title.id, noteToDelete.id);
@@ -161,6 +166,7 @@ export default function TitleDetailPage() {
                 </CardContent>
               </Card>
             ))}
+             <div ref={notesEndRef} />
           </div>
         ) : (
             <div className="text-center py-16">

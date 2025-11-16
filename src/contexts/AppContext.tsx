@@ -35,7 +35,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
       notes: [],
       createdAt: Date.now(),
     };
-    setTitles(prev => [...prev, newTitle]);
+    setTitles(prev => [newTitle, ...prev]);
   }, [setTitles]);
 
   const deleteTitle = useCallback((id: string) => {
@@ -60,7 +60,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     setTitles(prev =>
       prev.map(title =>
         title.id === titleId
-          ? { ...title, notes: [...title.notes, newNote] }
+          ? { ...title, notes: [newNote, ...title.notes] }
           : title
       )
     );
