@@ -155,12 +155,14 @@ export default function TitleDetailPage() {
                       {formatDistanceToNow(new Date(note.createdAt), { addSuffix: true })}
                     </p>
                   </div>
-                  <div className="flex flex-col sm:flex-row gap-2 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
-                    <Button variant="outline" size="icon" onClick={() => handleCopy(note.content)}>
-                      <Copy className="h-4 w-4" />
+                  <div className="flex items-center gap-1 opacity-0 sm:group-hover:opacity-100 transition-opacity">
+                    <Button variant="ghost" size="icon" onClick={() => handleCopy(note.content)}>
+                        <Copy className="h-4 w-4" />
+                        <span className="sr-only">Copy</span>
                     </Button>
-                    <Button variant="outline" size="icon" className="text-destructive hover:text-destructive border-destructive/50 hover:bg-destructive/10" onClick={() => setNoteToDelete(note)}>
-                      <Trash2 className="h-4 w-4" />
+                    <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive" onClick={() => setNoteToDelete(note)}>
+                        <Trash2 className="h-4 w-4" />
+                        <span className="sr-only">Delete</span>
                     </Button>
                   </div>
                 </CardContent>
